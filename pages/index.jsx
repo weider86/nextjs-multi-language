@@ -1,10 +1,11 @@
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styles from '../styles/Home.module.css';
-import blogPosts from './assets/posts.json';
-import { BlogCard } from './components/BlogCard';
 
-function Home() {
+export default function Home() {
+  const { t } = useTranslation();
   const { locale, locales, asPath } = useRouter();
 
   return (
@@ -24,11 +25,15 @@ function Home() {
         <div>
           <h1>Multi Language Blog</h1>
           <div>
-            {blogPosts.posts
-              .filter((p) => p.locale === locale)
-              .map((blogPost, i) => {
-                return <BlogCard key={i} blogPost={blogPost} />;
-              })}
+            <div className={styles.BlogCard}>
+              <div>
+                <img src={t('image')} width={200} />
+              </div>
+              <div>
+                <h3>{t('title')}</h3>
+                <span>{t('description')}</span>
+              </div>
+            </div>
           </div>
         </div>
       </main>
@@ -36,4 +41,10 @@ function Home() {
   );
 }
 
-export default Home;
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  };
+}
